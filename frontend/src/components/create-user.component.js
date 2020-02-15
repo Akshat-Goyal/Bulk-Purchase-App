@@ -35,21 +35,23 @@ const schema = yup.object({
       /(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)/,
       "Please Enter a valid Email"
     ),
-  country: yup.string().required("Please Enter your Country"),
-  city: yup.string().required("Please Enter your City"),
-  state: yup.string().required("Please Enter your State"),
+  city: yup
+    .string()
+    .required("Please Enter your City")
+    .matches(/^[A-Za-z]+$/, "Please Enter a valid City name"),
+  state: yup
+    .string()
+    .required("Please Enter your State")
+    .matches(/^[A-Za-z]+$/, "Please Enter a valid State name"),
   zip: yup
     .string()
     .required("Please Enter your Zip Code")
-    .matches(/^[0-9]{6}(?:-[0-9]{4})?$/, "Please Enter a valid Zip Code"),
+    .matches(/^[0-9]{6}$/, "Please Enter a valid Zip Code"),
   address: yup.string().required("Please Enter your Address"),
   phoneNo: yup
     .string()
     .required("Please Enter your Phone No.")
-    .matches(
-      /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/,
-      "Please Enter a valid Phone Number"
-    ),
+    .matches(/^[0-9]{10}$/, "Please Enter a 10 digit Phone Number"),
   password: yup
     .string()
     .required("Please Enter your password")
@@ -72,7 +74,6 @@ export default class CreateUser extends Component {
           firstName: "",
           lastName: "",
           username: "",
-          country: "",
           city: "",
           state: "",
           zip: "",
@@ -91,10 +92,17 @@ export default class CreateUser extends Component {
                     "username",
                     "This username already exists!"
                   )
-                : console.log("ok");
+                : axios
+                    .post("http://localhost:4000/add", values)
+                    .then(res => {
+                      console.log("Registered Successfully!");
+                    })
+                    .catch(err => {
+                      actions.setFieldError("general", err.message);
+                    });
             })
             .catch(err => {
-              actions.setFieldError("general", err);
+              actions.setFieldError("general", err.message);
             })
             .finally(() => {
               actions.setSubmitting(false);
@@ -205,21 +213,6 @@ export default class CreateUser extends Component {
             </Form.Row>
 
             <Form.Row>
-              <Form.Group as={Col} md="4" controlId="validationFormikCity">
-                <Form.Label>City</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="City"
-                  name="city"
-                  value={values.city}
-                  onChange={handleChange}
-                  isInvalid={(touched.city || values.city) && errors.city}
-                />
-                <Form.Control.Feedback type="invalid">
-                  {errors.city}
-                </Form.Control.Feedback>
-              </Form.Group>
-
               <Form.Group as={Col} md="4" controlId="validationFormikState">
                 <Form.Label>State</Form.Label>
                 <Form.Control
@@ -232,6 +225,21 @@ export default class CreateUser extends Component {
                 />
                 <Form.Control.Feedback type="invalid">
                   {errors.state}
+                </Form.Control.Feedback>
+              </Form.Group>
+
+              <Form.Group as={Col} md="4" controlId="validationFormikCity">
+                <Form.Label>City</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="City"
+                  name="city"
+                  value={values.city}
+                  onChange={handleChange}
+                  isInvalid={(touched.city || values.city) && errors.city}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors.city}
                 </Form.Control.Feedback>
               </Form.Group>
 

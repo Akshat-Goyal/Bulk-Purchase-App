@@ -35,14 +35,13 @@ userRoutes.route("/").get(function(req, res) {
 // Adding a new user
 userRoutes.route("/add").post(function(req, res) {
   let user = new User(req.body);
-  // console.log(user);
   user
     .save()
     .then(user => {
       res.status(200).json({ User: "User added successfully" });
     })
     .catch(err => {
-      res.status(400).send("Error");
+      res.status(400).send("Error: " + err);
     });
 });
 
