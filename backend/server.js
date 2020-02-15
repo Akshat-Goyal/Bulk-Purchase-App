@@ -55,6 +55,17 @@ userRoutes.route("/exist").post(function(req, res) {
     .catch(err => res.status(400).json("Error: " + err));
 });
 
+// Login
+userRoutes.route("/login").post(function(req, res) {
+  username = req.body.username;
+  password = req.body.password;
+  User.find({ username: username, password: password })
+    .then(users => {
+      res.json(users);
+    })
+    .catch(err => res.status(400).json("Error: " + err));
+});
+
 // Getting a user by id
 userRoutes.route("/:id").get(function(req, res) {
   let id = req.params.id;

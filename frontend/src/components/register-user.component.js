@@ -57,15 +57,16 @@ const schema = yup.object({
     .required("Please Enter your password")
     .matches(
       /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/,
-      "Must Contain 8 Characters, One Uppercase, One Lowercase, One Number and one special case Character"
+      "Must Contain 8 Characters, One Alphabet, One Number and one special case Character"
     ),
   confirmPassword: yup
     .string()
     .required("Please Enter your password")
-    .oneOf([yup.ref("password"), null], "Passwords must match")
+    .oneOf([yup.ref("password"), null], "Passwords must match"),
+  userType: yup.string().required("Please Select the User type")
 });
 
-export default class CreateUser extends Component {
+export default class RegisterUser extends Component {
   render() {
     return (
       <Formik
@@ -81,13 +82,14 @@ export default class CreateUser extends Component {
           email: "",
           phoneNo: "",
           password: "",
-          confirmPassword: ""
+          confirmPassword: "",
+          userType: "Customer"
         }}
         onSubmit={(values, actions) => {
           axios
             .post("http://localhost:4000/exist", { username: values.username })
             .then(res => {
-              res.data.length != 0
+              res.data.length !== 0
                 ? actions.setFieldError(
                     "username",
                     "This username already exists!"
@@ -120,7 +122,7 @@ export default class CreateUser extends Component {
         }) => (
           <Form onSubmit={handleSubmit}>
             <Form.Row>
-              <Form.Group as={Col} md="4" controlId="validationFormikFirstName">
+              <Form.Group as={Col} md="4" controlId="registerFirstName">
                 <Form.Label>First Name</Form.Label>
                 <Form.Control
                   type="text"
@@ -137,7 +139,7 @@ export default class CreateUser extends Component {
                 </Form.Control.Feedback>
               </Form.Group>
 
-              <Form.Group as={Col} md="4" controlId="validationFormikLastName">
+              <Form.Group as={Col} md="4" controlId="registerLastName">
                 <Form.Label>Last Name</Form.Label>
                 <Form.Control
                   type="text"
@@ -154,7 +156,7 @@ export default class CreateUser extends Component {
                 </Form.Control.Feedback>
               </Form.Group>
 
-              <Form.Group as={Col} md="4" controlId="validationFormikUsername">
+              <Form.Group as={Col} md="4" controlId="registerUsername">
                 <Form.Label>Username</Form.Label>
                 <Form.Control
                   type="text"
@@ -174,7 +176,7 @@ export default class CreateUser extends Component {
             </Form.Row>
 
             <Form.Row>
-              <Form.Group as={Col} md="8" controlId="validationFormikEmail">
+              <Form.Group as={Col} md="8" controlId="registerEmail">
                 <Form.Label>Email</Form.Label>
                 <InputGroup>
                   <InputGroup.Prepend>
@@ -194,7 +196,7 @@ export default class CreateUser extends Component {
                 </InputGroup>
               </Form.Group>
 
-              <Form.Group as={Col} md="4" controlId="validationFormikPhoneNo">
+              <Form.Group as={Col} md="4" controlId="registerPhoneNo">
                 <Form.Label>Phone No.</Form.Label>
                 <Form.Control
                   type="text"
@@ -213,7 +215,7 @@ export default class CreateUser extends Component {
             </Form.Row>
 
             <Form.Row>
-              <Form.Group as={Col} md="4" controlId="validationFormikState">
+              <Form.Group as={Col} md="4" controlId="registerState">
                 <Form.Label>State</Form.Label>
                 <Form.Control
                   type="text"
@@ -228,7 +230,7 @@ export default class CreateUser extends Component {
                 </Form.Control.Feedback>
               </Form.Group>
 
-              <Form.Group as={Col} md="4" controlId="validationFormikCity">
+              <Form.Group as={Col} md="4" controlId="registerCity">
                 <Form.Label>City</Form.Label>
                 <Form.Control
                   type="text"
@@ -243,7 +245,7 @@ export default class CreateUser extends Component {
                 </Form.Control.Feedback>
               </Form.Group>
 
-              <Form.Group as={Col} md="4" controlId="validationFormikZip">
+              <Form.Group as={Col} md="4" controlId="registerZip">
                 <Form.Label>Zip</Form.Label>
                 <Form.Control
                   type="text"
@@ -259,7 +261,7 @@ export default class CreateUser extends Component {
               </Form.Group>
             </Form.Row>
 
-            <Form.Group controlId="validationFormikAddress">
+            <Form.Group controlId="registerAddress">
               <Form.Label>Address</Form.Label>
               <Form.Control
                 type="text"
@@ -277,7 +279,7 @@ export default class CreateUser extends Component {
             </Form.Group>
 
             <Form.Row>
-              <Form.Group as={Col} md="6" controlId="validationFormikPassword">
+              <Form.Group as={Col} md="6" controlId="registerPassword">
                 <Form.Label>Password</Form.Label>
                 <Form.Control
                   type="text"
@@ -294,11 +296,7 @@ export default class CreateUser extends Component {
                 </Form.Control.Feedback>
               </Form.Group>
 
-              <Form.Group
-                as={Col}
-                md="6"
-                controlId="validationFormikConfirmPassword"
-              >
+              <Form.Group as={Col} md="6" controlId="registerConfirmPassword">
                 <Form.Label>Confirm Password</Form.Label>
                 <Form.Control
                   type="text"
@@ -316,6 +314,19 @@ export default class CreateUser extends Component {
                 </Form.Control.Feedback>
               </Form.Group>
             </Form.Row>
+
+            <Form.Group controlId="registerUserType">
+              <Form.Label>User Type</Form.Label>
+              <Form.Control
+                as="select"
+                name="userType"
+                value={values.userType}
+                onChange={handleChange}
+              >
+                <option>Vendor</option>
+                <option>Customer</option>
+              </Form.Control>
+            </Form.Group>
 
             <Button type="submit" name="submit">
               Submit
