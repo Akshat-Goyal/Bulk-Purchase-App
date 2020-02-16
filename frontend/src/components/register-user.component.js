@@ -11,6 +11,7 @@ import {
 } from "react-bootstrap";
 import { Formik } from "formik";
 import * as yup from "yup";
+import { UserNavbar } from "./navbar.component";
 
 const schema = yup.object({
   firstName: yup
@@ -67,7 +68,7 @@ const schema = yup.object({
 });
 
 export default class RegisterUser extends Component {
-  render() {
+  RegisterForm = () => {
     return (
       <Formik
         validationSchema={schema}
@@ -87,7 +88,9 @@ export default class RegisterUser extends Component {
         }}
         onSubmit={(values, actions) => {
           axios
-            .post("http://localhost:4000/exist", { username: values.username })
+            .post("http://localhost:4000/user/exist", {
+              username: values.username
+            })
             .then(res => {
               res.data.length !== 0
                 ? actions.setFieldError(
@@ -95,7 +98,7 @@ export default class RegisterUser extends Component {
                     "This username already exists!"
                   )
                 : axios
-                    .post("http://localhost:4000/add", values)
+                    .post("http://localhost:4000/user/add", values)
                     .then(res => {
                       console.log("Registered Successfully!");
                     })
@@ -334,6 +337,16 @@ export default class RegisterUser extends Component {
           </Form>
         )}
       </Formik>
+    );
+  };
+
+  render() {
+    return (
+      <React.Fragment>
+        <UserNavbar />
+        <br />
+        <this.RegisterForm />
+      </React.Fragment>
     );
   }
 }

@@ -11,6 +11,7 @@ import {
 } from "react-bootstrap";
 import { Formik } from "formik";
 import * as yup from "yup";
+import { UserNavbar } from "./navbar.component";
 
 const schema = yup.object({
   username: yup
@@ -28,7 +29,7 @@ const schema = yup.object({
 });
 
 export default class LoginUser extends Component {
-  render() {
+  LoginForm = () => {
     return (
       <Formik
         validationSchema={schema}
@@ -38,7 +39,7 @@ export default class LoginUser extends Component {
         }}
         onSubmit={(values, actions) => {
           axios
-            .post("http://localhost:4000/login", values)
+            .post("http://localhost:4000/user/login", values)
             .then(res => {
               if (res.data.length !== 0) {
                 console.log("Successfully Logged!");
@@ -107,6 +108,16 @@ export default class LoginUser extends Component {
           </Form>
         )}
       </Formik>
+    );
+  };
+
+  render() {
+    return (
+      <React.Fragment>
+        <UserNavbar />
+        <br />
+        <this.LoginForm />
+      </React.Fragment>
     );
   }
 }
