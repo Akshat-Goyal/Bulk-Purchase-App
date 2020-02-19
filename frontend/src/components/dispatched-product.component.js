@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import { Link } from "react-router-dom";
+import ls from "local-storage";
 import axios from "axios";
 import {
   Form,
@@ -48,6 +50,9 @@ export default class DispatchedProduct extends Component {
             >
               Dispatched
             </Nav.Link>
+            <Link className="nav-link" to="/login" onClick={e => ls.clear()}>
+              LogOut
+            </Link>
           </Nav>
         </Navbar>
       </React.Fragment>
@@ -123,14 +128,6 @@ export default class DispatchedProduct extends Component {
     body.push(<tr>{row}</tr>);
     table.push(<thead>{body}</thead>);
     body = [];
-    // for (let i in this.state.review) {
-    //   row = [];
-    //   row.push(<td>{this.state.review[i]["productName"]}</td>);
-    //   row.push(<td>{this.state.review[i]["username"]}</td>);
-    //   row.push(<td>{this.state.review[i]["rating"]}</td>);
-    //   row.push(<td>{this.state.review[i]["review"]}</td>);
-    //   body.push(<tr>{row}</tr>);
-    // }
     for (let i in this.state.product) {
       let review = null;
       for (let j in this.state.review) {
@@ -168,10 +165,15 @@ export default class DispatchedProduct extends Component {
   render() {
     return (
       <React.Fragment>
-        <this.VendorNavbar />
-        <br />
-        <this.HandleAlert />
-        <this.View />
+        {ls.get("username") === this.props.match.params.id &&
+          ls.get("userType") === "vendor" && (
+            <React.Fragment>
+              <this.VendorNavbar />
+              <br />
+              <this.HandleAlert />
+              <this.View />
+            </React.Fragment>
+          )}
       </React.Fragment>
     );
   }

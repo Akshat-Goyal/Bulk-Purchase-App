@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
+import ls from "local-storage";
 import axios from "axios";
 import {
   Form,
@@ -114,6 +115,9 @@ export default class SearchProduct extends Component {
             >
               Status
             </Nav.Link>
+            <Link className="nav-link" to="/login" onClick={e => ls.clear()}>
+              LogOut
+            </Link>
           </Nav>
         </Navbar>
         <br />
@@ -318,10 +322,15 @@ export default class SearchProduct extends Component {
   render() {
     return (
       <React.Fragment>
-        <this.CustomerNavbar />
-        <br />
-        <this.HandleAlert />
-        <this.View />
+        {ls.get("username") === this.props.match.params.id &&
+          ls.get("userType") === "customer" && (
+            <React.Fragment>
+              <this.CustomerNavbar />
+              <br />
+              <this.HandleAlert />
+              <this.View />
+            </React.Fragment>
+          )}
       </React.Fragment>
     );
   }

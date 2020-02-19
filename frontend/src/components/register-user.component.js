@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import ls from "local-storage";
 import { Redirect } from "react-router-dom";
 import axios from "axios";
 import {
@@ -116,6 +117,7 @@ export default class RegisterUser extends Component {
           userType: "Customer"
         }}
         onSubmit={(values, actions) => {
+          values.userType = values.userType.toLowerCase();
           axios
             .post("http://localhost:4000/user/exist", {
               username: values.username
@@ -130,9 +132,11 @@ export default class RegisterUser extends Component {
                 axios
                   .post("http://localhost:4000/user/add", values)
                   .then(res => {
+                    ls.set("username", values.username);
+                    ls.set("userType", values.userType);
                     this.setState({
                       redirect: true,
-                      type: values.userType.toLowerCase(),
+                      type: values.userType,
                       username: values.username
                     });
                   })

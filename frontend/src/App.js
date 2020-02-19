@@ -2,7 +2,6 @@ import React from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { BrowserRouter as Router, Route } from "react-router-dom";
 
-import Home from "./components/home.component";
 import RegisterUser from "./components/register-user.component";
 import LoginUser from "./components/login-user.component";
 import AddProduct from "./components/add-product.component";

@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import ls from "local-storage";
 import { Redirect } from "react-router";
 import axios from "axios";
 import {
@@ -69,9 +70,11 @@ export default class LoginUser extends Component {
             .post("http://localhost:4000/user/login", values)
             .then(res => {
               if (res.data !== null && res.data.length !== 0) {
+                ls.set("username", res.data.username);
+                ls.set("userType", res.data.userType);
                 this.setState({
-                  type: res.data.user.userType,
-                  username: res.data.user.username,
+                  type: res.data.userType,
+                  username: res.data.username,
                   redirect: true
                 });
               } else {
