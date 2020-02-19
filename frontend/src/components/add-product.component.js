@@ -7,11 +7,13 @@ import {
   InputGroup,
   FormGroup,
   FormControl,
+  Navbar,
+  Nav,
+  Alert,
   ControlLabel
 } from "react-bootstrap";
 import { Formik } from "formik";
 import * as yup from "yup";
-import { VendorNavbar } from "./navbar.component";
 
 const schema = yup.object({
   username: yup.string().required(),
@@ -21,16 +23,80 @@ const schema = yup.object({
     .min(4, "Too Short!")
     .max(64, "Too Long!"),
   price: yup
-    .string()
-    .required("Please Enter the Price")
-    .matches(/^[0-9]+$/, "Please Enter an Integer!"),
+    .number()
+    .min(0)
+    .required("Please Enter the Price"),
   quantity: yup
-    .string()
+    .number()
     .required("Please Enter the Quantity")
-    .matches(/^[0-9]+$/, "Please Enter an Integer!")
+    .min(1)
 });
 
 export default class AddProduct extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      shows: "",
+      showe: ""
+    };
+  }
+
+  VendorNavbar = () => {
+    return (
+      <React.Fragment>
+        <Navbar bg="dark" variant="dark">
+          <Navbar.Brand href="#">Home</Navbar.Brand>
+          <Nav className="mr-auto">
+            <Nav.Link href={"/vendor/" + this.props.match.params.id + "/add"}>
+              Add
+            </Nav.Link>
+            <Nav.Link href={"/vendor/" + this.props.match.params.id + "/view"}>
+              View
+            </Nav.Link>
+            <Nav.Link
+              href={"/vendor/" + this.props.match.params.id + "/placed"}
+            >
+              Placed
+            </Nav.Link>
+            <Nav.Link
+              href={"vendor/" + this.props.match.params.id + "/dispatched"}
+            >
+              Dispatched
+            </Nav.Link>
+          </Nav>
+        </Navbar>
+      </React.Fragment>
+    );
+  };
+
+  HandleAlert = () => {
+    return (
+      <React.Fragment>
+        {this.state.showe !== "" && (
+          <Alert
+            key="general"
+            variant={this.state.showe !== "" ? "danger" : "light"}
+            onClose={() => this.setState({ showe: "" })}
+            dismissible
+          >
+            {this.state.showe}
+          </Alert>
+        )}
+
+        {this.state.shows !== "" && (
+          <Alert
+            key="general"
+            variant={this.state.shows !== "" ? "success" : "light"}
+            onClose={() => this.setState({ shows: "" })}
+            dismissible
+          >
+            {this.state.shows}
+          </Alert>
+        )}
+      </React.Fragment>
+    );
+  };
+
   Add = () => {
     return (
       <Formik
@@ -39,16 +105,20 @@ export default class AddProduct extends Component {
           username: this.props.match.params.id,
           name: "",
           price: "",
-          quantity: ""
+          quantity: 1
         }}
         onSubmit={(values, actions) => {
           axios
             .post("http://localhost:4000/product/add", values)
             .then(res => {
-              console.log("Successfully Added!");
+              actions.resetForm();
+              this.setState({
+                shows: "Product Added Successfully!",
+                showe: ""
+              });
             })
             .catch(err => {
-              actions.setFieldError("general", err.message);
+              this.setState({ showe: err.message, shows: "" });
             })
             .finally(() => {
               actions.setSubmitting(false);
@@ -123,8 +193,9 @@ export default class AddProduct extends Component {
   render() {
     return (
       <React.Fragment>
-        <VendorNavbar />
+        <this.VendorNavbar />
         <br />
+        <this.HandleAlert />
         <this.Add />
       </React.Fragment>
     );

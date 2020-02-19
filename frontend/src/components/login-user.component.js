@@ -1,17 +1,20 @@
 import React, { Component } from "react";
+import { Redirect } from "react-router";
 import axios from "axios";
 import {
   Form,
   Button,
   Col,
+  Alert,
   InputGroup,
   FormGroup,
   FormControl,
+  Navbar,
+  Nav,
   ControlLabel
 } from "react-bootstrap";
 import { Formik } from "formik";
 import * as yup from "yup";
-import { UserNavbar } from "./navbar.component";
 
 const schema = yup.object({
   username: yup
@@ -29,6 +32,30 @@ const schema = yup.object({
 });
 
 export default class LoginUser extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      redirect: false,
+      username: "",
+      show: false,
+      type: "customer"
+    };
+  }
+
+  UserNavbar = () => {
+    return (
+      <React.Fragment>
+        <Navbar bg="dark" variant="dark">
+          <Navbar.Brand href="#">Home</Navbar.Brand>
+          <Nav className="mr-auto">
+            <Nav.Link href="/register">Register</Nav.Link>
+            <Nav.Link href="/login">Login</Nav.Link>
+          </Nav>
+        </Navbar>
+      </React.Fragment>
+    );
+  };
+
   LoginForm = () => {
     return (
       <Formik
@@ -41,18 +68,23 @@ export default class LoginUser extends Component {
           axios
             .post("http://localhost:4000/user/login", values)
             .then(res => {
-              if (res.data.length !== 0) {
-                console.log("Successfully Logged!");
+              if (res.data !== null && res.data.length !== 0) {
+                this.setState({
+                  type: res.data.user.userType,
+                  username: res.data.user.username,
+                  redirect: true
+                });
               } else {
                 actions.setFieldError(
                   "general",
                   "Username or Password is Incorrect!"
                 );
-                console.log("Unsuccessfull!");
+                this.setState({ show: true });
               }
             })
             .catch(err => {
               actions.setFieldError("general", err.message);
+              this.setState({ show: true });
             })
             .finally(() => {
               actions.setSubmitting(false);
@@ -69,6 +101,19 @@ export default class LoginUser extends Component {
           errors
         }) => (
           <Form onSubmit={handleSubmit}>
+            {this.state.show && (
+              <Form.Group>
+                <Alert
+                  key="general"
+                  variant={errors.general ? "danger" : "light"}
+                  onClose={() => this.setState({ show: false })}
+                  dismissible
+                >
+                  {errors.general}
+                </Alert>
+              </Form.Group>
+            )}
+
             <Form.Group md="6" controlId="loginUsername">
               <Form.Label>Username</Form.Label>
               <Form.Control
@@ -86,11 +131,11 @@ export default class LoginUser extends Component {
                 {errors.username}
               </Form.Control.Feedback>
             </Form.Group>
-
             <Form.Group md="6" controlId="loginPassword">
               <Form.Label>Password</Form.Label>
               <Form.Control
-                type="text"
+                type="password"
+                secureTextEntry
                 placeholder="Password"
                 name="password"
                 value={values.password}
@@ -112,9 +157,20 @@ export default class LoginUser extends Component {
   };
 
   render() {
+    if (this.state.redirect) {
+      if (this.state.type === "customer") {
+        return (
+          <Redirect push to={"/customer/" + this.state.username + "/search"} />
+        );
+      } else {
+        return (
+          <Redirect push to={"/vendor/" + this.state.username + "/view"} />
+        );
+      }
+    }
     return (
       <React.Fragment>
-        <UserNavbar />
+        <this.UserNavbar />
         <br />
         <this.LoginForm />
       </React.Fragment>

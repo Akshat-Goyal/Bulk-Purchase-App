@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { Redirect } from "react-router-dom";
 import axios from "axios";
 import {
   Form,
@@ -7,21 +8,25 @@ import {
   InputGroup,
   FormGroup,
   FormControl,
+  Navbar,
+  Nav,
+  Alert,
   ControlLabel
 } from "react-bootstrap";
 import { Formik } from "formik";
 import * as yup from "yup";
-import { UserNavbar } from "./navbar.component";
 
 const schema = yup.object({
   firstName: yup
     .string()
     .required("Please Enter your First Name")
+    .matches(/^[A-Za-z]+$/, "Please Enter a valid First Name")
     .min(2, "Too Short!")
     .max(32, "Too Long!"),
   lastName: yup
     .string()
     .required("Please Enter your Last Name")
+    .matches(/^[A-Za-z]+$/, "Please Enter a valid Last Name")
     .min(2, "Too Short!")
     .max(32, "Too Long!"),
   username: yup
@@ -68,6 +73,30 @@ const schema = yup.object({
 });
 
 export default class RegisterUser extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      redirect: false,
+      username: "",
+      type: "customer",
+      show: false
+    };
+  }
+
+  UserNavbar = () => {
+    return (
+      <React.Fragment>
+        <Navbar bg="dark" variant="dark">
+          <Navbar.Brand href="#">Home</Navbar.Brand>
+          <Nav className="mr-auto">
+            <Nav.Link href="/register">Register</Nav.Link>
+            <Nav.Link href="/login">Login</Nav.Link>
+          </Nav>
+        </Navbar>
+      </React.Fragment>
+    );
+  };
+
   RegisterForm = () => {
     return (
       <Formik
@@ -92,22 +121,30 @@ export default class RegisterUser extends Component {
               username: values.username
             })
             .then(res => {
-              res.data.length !== 0
-                ? actions.setFieldError(
-                    "username",
-                    "This username already exists!"
-                  )
-                : axios
-                    .post("http://localhost:4000/user/add", values)
-                    .then(res => {
-                      console.log("Registered Successfully!");
-                    })
-                    .catch(err => {
-                      actions.setFieldError("general", err.message);
+              if (res.data !== null && res.data.length !== 0) {
+                actions.setFieldError(
+                  "username",
+                  "This username already exists!"
+                );
+              } else {
+                axios
+                  .post("http://localhost:4000/user/add", values)
+                  .then(res => {
+                    this.setState({
+                      redirect: true,
+                      type: values.userType.toLowerCase(),
+                      username: values.username
                     });
+                  })
+                  .catch(err => {
+                    actions.setFieldError("general", err.message);
+                    this.setState({ show: true });
+                  });
+              }
             })
             .catch(err => {
               actions.setFieldError("general", err.message);
+              this.setState({ show: true });
             })
             .finally(() => {
               actions.setSubmitting(false);
@@ -124,6 +161,19 @@ export default class RegisterUser extends Component {
           errors
         }) => (
           <Form onSubmit={handleSubmit}>
+            {this.state.show && (
+              <Form.Group>
+                <Alert
+                  key="general"
+                  variant={errors.general ? "danger" : "light"}
+                  onClose={() => this.setState({ show: false })}
+                  dismissible
+                >
+                  {errors.general}
+                </Alert>
+              </Form.Group>
+            )}
+
             <Form.Row>
               <Form.Group as={Col} md="4" controlId="registerFirstName">
                 <Form.Label>First Name</Form.Label>
@@ -285,7 +335,8 @@ export default class RegisterUser extends Component {
               <Form.Group as={Col} md="6" controlId="registerPassword">
                 <Form.Label>Password</Form.Label>
                 <Form.Control
-                  type="text"
+                  type="password"
+                  secureTextEntry
                   placeholder="Password"
                   name="password"
                   value={values.password}
@@ -302,7 +353,8 @@ export default class RegisterUser extends Component {
               <Form.Group as={Col} md="6" controlId="registerConfirmPassword">
                 <Form.Label>Confirm Password</Form.Label>
                 <Form.Control
-                  type="text"
+                  type="password"
+                  secureTextEntry
                   placeholder="Confirm Password"
                   name="confirmPassword"
                   value={values.confirmPassword}
@@ -341,9 +393,20 @@ export default class RegisterUser extends Component {
   };
 
   render() {
+    if (this.state.redirect) {
+      if (this.state.type === "customer") {
+        return (
+          <Redirect push to={"/customer/" + this.state.username + "/search"} />
+        );
+      } else {
+        return (
+          <Redirect push to={"/vendor/" + this.state.username + "/view"} />
+        );
+      }
+    }
     return (
       <React.Fragment>
-        <UserNavbar />
+        <this.UserNavbar />
         <br />
         <this.RegisterForm />
       </React.Fragment>

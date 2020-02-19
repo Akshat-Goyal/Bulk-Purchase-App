@@ -46,6 +46,16 @@ class VendorNavbar extends Component {
                 View
               </Link>
             </li>
+            <li className="navbar-item">
+              <Link to="/vendor/:id/placed" className="nav-link">
+                Placed
+              </Link>
+            </li>
+            <li className="navbar-item">
+              <Link to="/vendor/:id/dispatched" className="nav-link">
+                Dispatched
+              </Link>
+            </li>
           </ul>
         </div>
       </nav>
@@ -53,4 +63,30 @@ class VendorNavbar extends Component {
   }
 }
 
-export { UserNavbar, VendorNavbar };
+class CustomerNavbar extends Component {
+  render() {
+    return (
+      <nav className="navbar navbar-dark bg-dark navbar-expand-lg">
+        <Link to="/" className="navbar-brand">
+          App
+        </Link>
+        <div className="collpase navbar-collapse">
+          <ul className="navbar-nav mr-auto">
+            <li className="navbar-item">
+              <Link to="/customer/:id/search" className="nav-link">
+                Products
+              </Link>
+            </li>
+            <li className="navbar-item">
+              <Link to="/customer/:id/status" className="nav-link">
+                Status
+              </Link>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    );
+  }
+}
+
+export { UserNavbar, VendorNavbar, CustomerNavbar };
