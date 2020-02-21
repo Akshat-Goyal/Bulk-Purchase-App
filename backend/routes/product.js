@@ -44,11 +44,6 @@ router.route("/search").post(function(req, res) {
     Product.fuzzySearch(req.body.name, function(err, products) {
       res.status(200).json(products);
     });
-    // Product.find({ name: req.body.name, status: "waiting" })
-    //   .then(products => {
-    //     res.status(200).json(products);
-    //   })
-    // .catch(err => res.status(400).json(err));
   }
 });
 
