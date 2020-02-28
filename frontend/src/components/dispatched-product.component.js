@@ -18,6 +18,7 @@ import {
 } from "react-bootstrap";
 
 export default class DispatchedProduct extends Component {
+  _isMounted = false;
   constructor(props) {
     super(props);
     this.state = {
@@ -143,10 +144,10 @@ export default class DispatchedProduct extends Component {
         row.push(<td>{"Not Rated Yet"}</td>);
         row.push(<td>{"No Reviews Available"}</td>);
       } else {
-        row.push(<td>{this.state.review[i]["productName"]}</td>);
-        row.push(<td>{this.state.review[i]["username"]}</td>);
-        row.push(<td>{this.state.review[i]["rating"]}</td>);
-        row.push(<td>{this.state.review[i]["review"]}</td>);
+        row.push(<td>{review["productName"]}</td>);
+        row.push(<td>{review["username"]}</td>);
+        row.push(<td>{review["rating"]}</td>);
+        row.push(<td>{review["review"]}</td>);
       }
       body.push(<tr>{row}</tr>);
     }
